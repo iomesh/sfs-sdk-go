@@ -62,12 +62,12 @@ type IoK8SApimachineryPkgApisMetaV1OwnerReferenceV2 struct {
 }
 
 type Spec struct {
-	AgentServer interface{}       `json:"agent_server"`         // If there is an agent on this node: ip+port.
-	DataServer  interface{}       `json:"data_server"`          // If there is a DS on this node: ip+port. Updated by end users.
+	AgentServer *string           `json:"agent_server"`         // If there is an agent on this node: ip+port.
+	DataServer  *string           `json:"data_server"`          // If there is a DS on this node: ip+port. Updated by end users.
 	DataShards  map[string]string `json:"data_shards,omitempty"`// Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	MetaServer  interface{}       `json:"meta_server"`          // If there is a MDS on this node: ip+port. Updated by end users.
+	MetaServer  *string           `json:"meta_server"`          // If there is a MDS on this node: ip+port. Updated by end users.
 	MetaShards  map[string]string `json:"meta_shards,omitempty"`// Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	NodeUUID    interface{}       `json:"node_uuid"`            // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
+	NodeUUID    *string           `json:"node_uuid"`            // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
 	Online      bool              `json:"online"`               // If the node should be considered as a candidate when placing shards. Updated by end users.
 }
 
