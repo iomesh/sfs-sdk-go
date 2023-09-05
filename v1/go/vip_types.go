@@ -65,8 +65,9 @@ type Spec struct {
 	Addr string `json:"addr"`// The ipv4 addr.
 }
 
-type StatusClass struct {
-	Ready interface{} `json:"ready"`
+type Status struct {
+	Ready       bool    `json:"ready"`       // If this vip is ready.
+	SessionName *string `json:"session_name"`// Which session this vip is appointed.
 }
 
 // io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta, ListMeta describes metadata that synthetic
@@ -77,13 +78,4 @@ type IoK8SApimachineryPkgApisMetaV1ListMeta struct {
 	RemainingItemCount *int64  `json:"remainingItemCount,omitempty"`// remainingItemCount is the number of subsequent items in the list which are not included; in this list response. If the list request contained label or field selectors, then the; number of remaining items is unknown and the field will be left unset and omitted during; serialization. If the list is complete (either because it is not chunking or because this; is the last chunk), then there are no more remaining items and this field will be left; unset and omitted during serialization. Servers older than v1.15 do not set this field.; The intended use of the remainingItemCount is *estimating* the size of a collection.; Clients should not rely on the remainingItemCount to be set or to be exact.
 	ResourceVersion    *string `json:"resourceVersion,omitempty"`   // String that identifies the server's internal version of this object that can be used by; clients to determine when objects have changed. Value must be treated as opaque by; clients and passed unmodified back to the server. Populated by the system. Read-only.; More info:; https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	SelfLink           *string `json:"selfLink,omitempty"`          // Deprecated: selfLink is a legacy read-only field that is no longer populated by the; system.
-}
-
-type Status struct {
-	AnythingArray []interface{}
-	Bool          *bool
-	Double        *float64
-	Integer       *int64
-	StatusClass   *StatusClass
-	String        *string
 }
