@@ -1,2 +1,2 @@
-# sfs-api
-APIs for SFS
+# sfs-sdk-go
+SFS SDK for Go
