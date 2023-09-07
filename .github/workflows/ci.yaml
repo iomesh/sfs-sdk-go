@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: ~1.20
+  SDK_WORKING_DIR: github.com/iomesh/sfs-sdk-go
+
+jobs:
+  typo-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Spell check with typos
+      uses: crate-ci/typos@v1.16.8
+
+  go-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Run go linter
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.54
+        skip-pkg-cache: true
+        skip-build-cache: true
+        args: --timeout=10m0s
+
+  verify-codegen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.SDK_WORKING_DIR }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        path: ${{ env.SDK_WORKING_DIR }}
+    - uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v2
+    - name: Install dependencies
+      run: |
+        go install github.com/golang/protobuf/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+        go mod tidy
+    - name: Verify codegen
+      run: |
+        make verify-codegen
