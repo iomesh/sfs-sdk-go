@@ -22,6 +22,8 @@ type CloudProviderExpansion interface{}
 
 type ClusterExpansion interface{}
 
+type MetricExpansion interface{}
+
 type NamespaceExpansion interface{}
 
 type NodeExpansion interface{}
