@@ -33,3 +33,10 @@ linters-settings:
       - G112
       - G201
       - G203
+  revive:
+    rules:
+    - name: var-naming
+      severity: warning
+      disabled: false
+      arguments:
+        - [ "QPS" ] # AllowList

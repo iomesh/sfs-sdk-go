@@ -85,6 +85,54 @@ type ClusterSpec struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// Metric is the Schema for the Metrics API.
+type Metric struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   MetricSpec   `json:"spec,omitempty"`
+	Status MetricStatus `json:"status,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// MetricList contains a list of Metric.
+type MetricList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Metric `json:"items"`
+}
+
+// MetricSpec defines the desired state of Metric.
+type MetricSpec struct {
+	ClusterID string `json:"cluster_id"` // Cluster ID.
+}
+
+// MetricStatus defines the observed state of Metric.
+type MetricStatus struct {
+	ClusterIOMetric      IOMetric              `json:"cluster_io_metric"`      // Cluster-wide IO metric.
+	ClusterStatMetric    StatMetric            `json:"cluster_stat_metric"`    // Cluster-wide statistic metric.
+	NamespaceIOMetrics   map[string]IOMetric   `json:"namespace_io_metrics"`   // IO metrics per namespace.
+	NamespaceStatMetrics map[string]StatMetric `json:"namespace_stat_metrics"` // Statistic metrics per namespace.
+}
+
+type IOMetric struct {
+	Read  PerfMetric `json:"read"`  // Read performance metric.
+	Write PerfMetric `json:"write"` // Write performance metric.
+}
+
+type PerfMetric struct {
+	Qps     uint64 `json:"qps"`     // Queries per second.
+	Bps     uint64 `json:"bps"`     // Bytes per second.
+	Latency uint64 `json:"latency"` // (average) Nanoseconds per query.
+}
+
+type StatMetric struct {
+	CapacityUsed uint64 `json:"capacity_used"` // Capacity used in bytes.
+	TotalFiles   uint64 `json:"total_files"`   // Total files.
+}
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // Namespace is the Schema for the namespaces API.
 type Namespace struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -105,14 +153,27 @@ type NamespaceList struct {
 // NamespaceSpec defines the desired state of Namespace.
 type NamespaceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	Capacity        int64             `json:"capacity"`          // Capacity limit in bytes.
-	CloudProvider   string            `json:"cloud_provider"`    // Cloud provider CRD name.
-	Dshards         int64             `json:"dshards"`           // Number of data shards.
-	Export          bool              `json:"export"`            // Whether to export the namespace, i.e. whether mountable.
-	Followers       int64             `json:"followers"`         // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
-	Mshards         int64             `json:"mshards"`           // Number of meta shards.
-	NFSExportConfig *NFSExportConfig  `json:"nfs_export_config"` // Configs of nfs-ganesha-export that sfs supports. None if it is not given.
-	Props           map[string]string `json:"props,omitempty"`   // Optional. Namespace properties.
+	CloudProvider   string           `json:"cloud_provider"`              // Cloud provider CRD name.
+	StoragePolicy   *StoragePolicy   `json:"storage_policy"`              // Storage Policy used to create volumes.
+	Protocols       *Protocols       `json:"protocols"`                   // Supported access protocols.
+	Capacity        int64            `json:"capacity"`                    // Capacity limit in bytes.
+	Mshards         int64            `json:"mshards"`                     // Number of meta shards.
+	Dshards         int64            `json:"dshards"`                     // Number of data shards.
+	Export          bool             `json:"export"`                      // Whether to export the namespace, i.e. whether mountable.
+	Followers       int64            `json:"followers"`                   // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
+	NFSExportConfig *NFSExportConfig `json:"nfs_export_config,omitempty"` // Configs of nfs-ganesha-export that sfs supports. None if it is not given.
+	UserDescription *string          `json:"user_description,omitempty"`  // User-defined description.
+}
+
+type StoragePolicy struct {
+	Replicas      uint32            `json:"replicas"`             // Backend storage replicas.
+	ThinProvision bool              `json:"thin_provision"`       // Whether the backend storage is thin-provisioned.
+	Parameters    map[string]string `json:"parameters,omitempty"` // Parameters unique to specific backend storage.
+}
+
+type Protocols struct {
+	SupportNFS  bool `json:"support_nfs"`  // Whether this namespace can be accessed via NFS.
+	SupportHDFS bool `json:"support_hdfs"` // Whether this namespace can be accessed via HDFS.
 }
 
 type NFSExportConfig struct {
