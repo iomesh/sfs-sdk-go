@@ -39,22 +39,21 @@ type CloudProviderList struct {
 	Items           []CloudProvider `json:"items"`
 }
 
-// Backend storage type.
-type StorageType string
-
-const (
-	ELF   StorageType = "Elf"
-	Iscsi StorageType = "Iscsi"
-	Local StorageType = "Local"
-)
-
 // CloudProviderSpec defines the desired state of CloudProvider.
 type CloudProviderSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	Endpoint    string            `json:"endpoint"`             // Cloud provider endpoint address, e.g. "http://xx.xx.xx.xx:xxxx"
 	Parameters  map[string]string `json:"parameters,omitempty"` // Backend storage specific parameters
 	StorageType StorageType       `json:"storage_type"`         // Backend storage type.
 }
+
+// Backend storage type.
+type StorageType string
+
+const (
+	StorageTypeELF   StorageType = "elf"
+	StorageTypeIscsi StorageType = "iscsi"
+	StorageTypeLocal StorageType = "local"
+)
 
 // +genclient
 // +genclient:noStatus
@@ -77,7 +76,6 @@ type ClusterList struct {
 
 // ClusterSpec defines the desired state of Cluster.
 type ClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	NextNsid      int64 `json:"next_nsid"`       // Next available ns id in this cluster
 	NextSessionID int64 `json:"next_session_id"` // Next available session id in this cluster
 	NextShardid   int64 `json:"next_shardid"`    // Next available shard id in this cluster
@@ -121,7 +119,7 @@ type IOMetric struct {
 }
 
 type PerfMetric struct {
-	Qps     uint64 `json:"qps"`     // Queries per second.
+	QPS     uint64 `json:"qps"`     // Queries per second.
 	Bps     uint64 `json:"bps"`     // Bytes per second.
 	Latency uint64 `json:"latency"` // (average) Nanoseconds per query.
 }
@@ -152,7 +150,6 @@ type NamespaceList struct {
 
 // NamespaceSpec defines the desired state of Namespace.
 type NamespaceSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	CloudProvider   string           `json:"cloud_provider"`              // Cloud provider CRD name.
 	StoragePolicy   *StoragePolicy   `json:"storage_policy"`              // Storage Policy used to create volumes.
 	Protocols       *Protocols       `json:"protocols"`                   // Supported access protocols.
@@ -177,84 +174,99 @@ type Protocols struct {
 }
 
 type NFSExportConfig struct {
-	AccessConfig  AccessConfig  `json:"access_config"`   // Access management
-	AnonyUserInfo AnonyUserInfo `json:"anony_user_info"` // Anonymous user info,
-	SECType       SECType       `json:"sec_type"`        // User authorization managemennt, Sys or None, default is Sys
-	Squash        Squash        `json:"squash"`          // RootSquash, NoRootSquash or AllSquash, default is RootSquash
+	SECType           SECType           `json:"sec_type"`        // User authorization managemennt.
+	Squash            SquashType        `json:"squash"`          // RootSquash, NoRootSquash or AllSquash.
+	AnonymousUserInfo AnonymousUserInfo `json:"anony_user_info"` // Anonymous user info.
+	AccessConfig      AccessConfig      `json:"access_config"`   // Access management.
+}
+
+// User authorization managemennt.
+type SECType string
+
+const (
+	SECTypeNone SECType = "None"
+	SECTypeSys  SECType = "Sys"
+)
+
+// RootSquash, NoRootSquash or AllSquash, default is RootSquash.
+type SquashType string
+
+const (
+	SquashTypeAllSquash    SquashType = "AllSquash"
+	SquashTypeNoRootSquash SquashType = "NoRootSquash"
+	SquashTypeRootSquash   SquashType = "RootSquash"
+)
+
+// Anonymous user info.
+type AnonymousUserInfo struct {
+	GID int64 `json:"gid"` // Group id, range INT32_MIN to UINT32_MAX according to ganesha manual doc.
+	UID int64 `json:"uid"` // User id, range INT32_MIN to UINT32_MAX according to ganesha manual doc.
 }
 
 // Access management.
 type AccessConfig struct {
-	DefaultAccessType    AccessType            `json:"default_access_type"`    // Default access type of this config
-	ExceptionAccessRules []ExceptionAccessRule `json:"exception_access_rules"` // Rules that diff with `default_access_type`, so access_type in exception_rules must not be; the same with `default_access_type`.
+	DefaultAccessType  AccessType   `json:"default_access_type"`  // Default access type.
+	SpecialAccessRules []AccessRule `json:"special_access_rules"` // Rules that diff with `default_access_type`, so access_type in special rules must not be; the same with `default_access_type`.
 }
 
-type ExceptionAccessRule struct {
-	AccessType AccessType `json:"access_type"` // Access type for the specific host(s)
-	Host       string     `json:"host"`        // Host format:  ip, hostname or CIDR(eg 192.168.1.0/24)
+type AccessRule struct {
+	AccessType AccessType `json:"access_type"` // Access type for the specific host(s).
+	// Client list entries can take on one of the following forms: Match any client:
+	//
+	// - @name       Netgroup name.
+	//
+	// - x.x.x.x/y   IPv4 network address.
+	//
+	// - wildcarded  If the string contains at least one ? or *
+	//             character (and is not simply "*"), the string is
+	//             used to pattern match host names. Note that [] may
+	//             also be used, but the pattern MUST have at least one
+	//             ? or *.
+	//
+	// - hostname    Match a single client (match is by IP address, all
+	//             addresses returned by getaddrinfo will match, the
+	//             getaddrinfo call is made at config parsing time).
+	//
+	// - IP address  Match a single client.
+	Clients string `json:"clients"`
 }
 
-// Anonymous user info.
-type AnonyUserInfo struct {
-	GID int64 `json:"gid"` // Group id, range INT32_MIN to UINT32_MAX according to ganesha manual doc
-	UID int64 `json:"uid"` // User id, range INT32_MIN to UINT32_MAX according to ganesha manual doc
-}
-
-// NamespaceStatus defines the observed state of Namespace.
-type NamespaceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	DshardIDS    []int64      `json:"dshard_ids"`    // Data shards assigned to this namespace.
-	ExportStatus ExportStatus `json:"export_status"` // Export status.
-	MshardIDS    []int64      `json:"mshard_ids"`    // Meta shards assigned to this namespace.
-	Nsid         int64        `json:"nsid"`          // Cluster wide exclusive ID allocated by the ns_manager.
-	State        State        `json:"state"`         // Namespace FSM state.
-}
-
-// Default access type of this config.
-//
 // Access type for the specific host(s).
 type AccessType string
 
 const (
 	AccessTypeNone AccessType = "None"
-	Ro             AccessType = "RO"
-	Rw             AccessType = "RW"
+	AccessTypeRO   AccessType = "RO"
+	AccessTypeRW   AccessType = "RW"
 )
 
-// User authorization managemennt, Sys or None, default is Sys.
-type SECType string
-
-const (
-	SECTypeNone SECType = "None"
-	Sys         SECType = "Sys"
-)
-
-// RootSquash, NoRootSquash or AllSquash, default is RootSquash.
-type Squash string
-
-const (
-	AllSquash    Squash = "AllSquash"
-	NoRootSquash Squash = "NoRootSquash"
-	RootSquash   Squash = "RootSquash"
-)
+// NamespaceStatus defines the observed state of Namespace.
+type NamespaceStatus struct {
+	DshardIDS    []int64        `json:"dshard_ids"`    // Data shards assigned to this namespace.
+	ExportStatus NsExportStatus `json:"export_status"` // Export status.
+	MshardIDS    []int64        `json:"mshard_ids"`    // Meta shards assigned to this namespace.
+	Nsid         int64          `json:"nsid"`          // Cluster wide exclusive ID allocated by the ns_manager.
+	State        NsState        `json:"state"`         // Namespace FSM state.
+}
 
 // Export status.
-type ExportStatus string
+type NsExportStatus string
 
 const (
-	Degraded   ExportStatus = "Degraded"
-	Exported   ExportStatus = "Exported"
-	Unexported ExportStatus = "Unexported"
+	NsExportStatusUnexported NsExportStatus = "Unexported"
+	NsExportStatusDegraded   NsExportStatus = "Degraded"
+	NsExportStatusExported   NsExportStatus = "Exported"
+	NsExportStatusAbnormal   NsExportStatus = "Abnormal"
 )
 
 // Namespace FSM state.
-type State string
+type NsState string
 
 const (
-	Deleting     State = "Deleting"
-	Exporting    State = "Exporting"
-	Initializing State = "Initializing"
-	Staging      State = "Staging"
+	NsStateInitializing NsState = "Initializing"
+	NsStateStaging      NsState = "Staging"
+	NsStateExporting    NsState = "Exporting"
+	NsStateDeleting     NsState = "Deleting"
 )
 
 // +genclient
@@ -278,7 +290,6 @@ type NodeList struct {
 
 // NodeSpec defines the desired state of Node.
 type NodeSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	AgentServer *string           `json:"agent_server"`          // If there is an agent on this node: ip+port.
 	DataServer  *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
 	DataShards  map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
@@ -290,7 +301,6 @@ type NodeSpec struct {
 
 // NodeStatus defines the observed state of Node.
 type NodeStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	DataShards map[string]string `json:"data_shards"` // Mounted data shards. shard_id -> volume_name:volume_target_path NB: this indicates the; mount status of a shard on this node, but does not mean if it should be attached or; detached. Only shard leader should be attached.
 	DataStatus *bool             `json:"data_status"` // Whether DS is healthy when there is a DS on this node: Data server status updated by this; node agent
 	LastActive *string           `json:"last_active"` // Node level status Last heartbeat updated by agent
@@ -320,7 +330,6 @@ type RecoveryDatabaseList struct {
 
 // RecoveryDatabaseSpec defines the desired state of RecoveryDatabase.
 type RecoveryDatabaseSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	Clids           map[string]string   `json:"clids"`            // Client entry records, clientid -> cid_recov_tag.
 	ReclaimingClids []int64             `json:"reclaiming_clids"` // Reclaiming client entry records, clientid -> cid_recov_tag.
 	Rfhs            map[string][]string `json:"rfhs"`             // Revoked file handle records, cid_recov_tag -> Vec<revoked file handle>.
@@ -348,25 +357,23 @@ type SessionList struct {
 
 // SessionSpec defines the desired state of Session.
 type SessionSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	ClientAddr   string            `json:"client_addr"`    // Exposed <ip:port>.
 	NodeName     string            `json:"node_name"`      // Node associated with the session.
+	SessionType  SessionType       `json:"stype"`          // Session type, e.g. nfs, fuse and etc.
 	ProtocolAddr string            `json:"protocol_addr"`  // Exposed <ip:port>.
-	Stype        Stype             `json:"stype"`          // Session type, e.g. nfs, fuse and etc.
+	ClientAddr   string            `json:"client_addr"`    // Exposed <ip:port>.
 	Vips         map[string]string `json:"vips,omitempty"` // VIP list assigned to this session.
 }
 
 // Session type, e.g. nfs, fuse and etc.
-type Stype string
+type SessionType string
 
 const (
-	Fuse Stype = "FUSE"
-	NFS  Stype = "NFS"
+	SessionTypeFuse SessionType = "FUSE"
+	SessionTypeNFS  SessionType = "NFS"
 )
 
 // SessionStatus defines the observed state of Session.
 type SessionStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	SessionID int64 `json:"session_id"` // Cluster wide exclusive ID.
 }
 
@@ -391,40 +398,39 @@ type ShardList struct {
 
 // ShardSpec defines the desired state of Shard.
 type ShardSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	CloudProvider string    `json:"cloud_provider"` // Cloud provider CRD name.
-	Export        bool      `json:"export"`         // If this shard is supposed to be export.
-	Followers     int64     `json:"followers"`      // How many follower nodes for this shard. e.g. there are `1 + followers` HA group members.
-	NSRef         NSRef     `json:"ns_ref"`         // Reference of the ns that this shard belongs.
-	Nsid          int64     `json:"nsid"`           // The ns id that this shard belongs.
-	ShardID       int64     `json:"shard_id"`       // The shard id.
-	ShardType     ShardType `json:"shard_type"`     // Meta or Data.
-	Size          int64     `json:"size"`           // Volume size in bytes.
-}
-
-// Reference of the ns that this shard belongs.
-type NSRef struct {
-	NSName      string `json:"ns_name"`
-	NSNamespace string `json:"ns_namespace"`
-	NSUid       string `json:"ns_uid"`
-}
-
-// ShardStatus defines the observed state of Shard.
-type ShardStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	Exported   bool     `json:"exported"`    // If this shard is exported.
-	HaMembers  []string `json:"ha_members"`  // HA group members, using `node_name` as identity.
-	NodeName   *string  `json:"node_name"`   // Which node updated the status.
-	VolumeName *string  `json:"volume_name"` // On-premise storage.
+	ShardID       int64       `json:"shard_id"`       // The shard id.
+	ShardType     ShardType   `json:"shard_type"`     // Meta or Data.
+	CloudProvider string      `json:"cloud_provider"` // Cloud provider CRD name.
+	Size          int64       `json:"size"`           // Volume size in bytes.
+	NsReference   NsReference `json:"ns_ref"`         // Reference of the ns that this shard belongs.
+	Nsid          int64       `json:"nsid"`           // The ns id that this shard belongs.
+	Export        bool        `json:"export"`         // If this shard is supposed to be export.
+	Followers     int64       `json:"followers"`      // How many follower nodes for this shard. e.g. there are `1 + followers` HA group members.
 }
 
 // Meta or Data.
 type ShardType string
 
 const (
-	Data ShardType = "Data"
-	Meta ShardType = "Meta"
+	ShardTypeData ShardType = "Data"
+	ShardTypeMeta ShardType = "Meta"
 )
+
+// Reference of the ns that this shard belongs.
+type NsReference struct {
+	NsName      string `json:"ns_name"`
+	NsNamespace string `json:"ns_namespace"`
+	NsUID       string `json:"ns_uid"`
+}
+
+// ShardStatus defines the observed state of Shard.
+type ShardStatus struct {
+	VolumeName    *string  `json:"volume_name,omitempty"` // On-premise storage.
+	VolumeCreated bool     `json:"volume_created"`        // Backend volume is created.
+	HAMembers     []string `json:"ha_members,omitempty"`  // HA group members, using `node_name` as identity.
+	NodeName      *string  `json:"node_name,omitempty"`   // Which node updated the status.
+	Exported      bool     `json:"exported"`              // If this shard is exported.
+}
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -447,13 +453,11 @@ type VipList struct {
 
 // VipSpec defines the desired state of Vip.
 type VipSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	Addr string `json:"addr"` // The ipv4 addr.
 }
 
 // VipStatus defines the observed state of Vip.
 type VipStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	Ready       bool    `json:"ready"`        // If this vip is ready.
 	SessionName *string `json:"session_name"` // Which session this vip is appointed.
 }
@@ -479,10 +483,9 @@ type VolumeList struct {
 
 // VolumeSpec defines the desired state of Volume.
 type VolumeSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	CloudProvider string    `json:"cloud_provider"` // Cloud provider name
-	NSRef         NSRef     `json:"ns_ref"`         // Reference of the ns that this volume belongs.
-	ShardID       int64     `json:"shard_id"`       // Shard that this volume is assigned.
-	ShardType     ShardType `json:"shard_type"`     // Shard type, Meta or Data.
-	Size          int64     `json:"size"`           // Volume size in bytes
+	CloudProvider string      `json:"cloud_provider"` // Cloud provider name
+	NsReference   NsReference `json:"ns_ref"`         // Reference of the ns that this volume belongs.
+	ShardID       int64       `json:"shard_id"`       // Shard that this volume is assigned.
+	ShardType     ShardType   `json:"shard_type"`     // Shard type, Meta or Data.
+	Size          int64       `json:"size"`           // Volume size in bytes
 }
