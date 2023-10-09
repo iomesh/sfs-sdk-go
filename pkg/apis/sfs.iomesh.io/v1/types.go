@@ -107,10 +107,10 @@ type MetricSpec struct {
 
 // MetricStatus defines the observed state of Metric.
 type MetricStatus struct {
-	ClusterIOMetric      IOMetric              `json:"cluster_io_metric"`      // Cluster-wide IO metric.
-	ClusterStatMetric    StatMetric            `json:"cluster_stat_metric"`    // Cluster-wide statistic metric.
-	NamespaceIOMetrics   map[string]IOMetric   `json:"namespace_io_metrics"`   // IO metrics per namespace.
-	NamespaceStatMetrics map[string]StatMetric `json:"namespace_stat_metrics"` // Statistic metrics per namespace.
+	ClusterIOMetric      IOMetric              `json:"cluster_io_metric"`                // Cluster-wide IO metric.
+	ClusterStatMetric    StatMetric            `json:"cluster_stat_metric"`              // Cluster-wide statistic metric.
+	NamespaceIOMetrics   map[string]IOMetric   `json:"namespace_io_metrics,omitempty"`   // IO metrics per namespace.
+	NamespaceStatMetrics map[string]StatMetric `json:"namespace_stat_metrics,omitempty"` // Statistic metrics per namespace.
 }
 
 type IOMetric struct {
@@ -150,16 +150,16 @@ type NamespaceList struct {
 
 // NamespaceSpec defines the desired state of Namespace.
 type NamespaceSpec struct {
-	CloudProvider   string           `json:"cloud_provider"`              // Cloud provider CRD name.
-	StoragePolicy   *StoragePolicy   `json:"storage_policy"`              // Storage Policy used to create volumes.
-	Protocols       *Protocols       `json:"protocols"`                   // Supported access protocols.
-	Capacity        int64            `json:"capacity"`                    // Capacity limit in bytes.
-	Mshards         int64            `json:"mshards"`                     // Number of meta shards.
-	Dshards         int64            `json:"dshards"`                     // Number of data shards.
-	Export          bool             `json:"export"`                      // Whether to export the namespace, i.e. whether mountable.
-	Followers       int64            `json:"followers"`                   // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
-	NFSExportConfig *NFSExportConfig `json:"nfs_export_config,omitempty"` // Configs of nfs-ganesha-export that sfs supports. None if it is not given.
-	UserDescription *string          `json:"user_description,omitempty"`  // User-defined description.
+	CloudProvider   string           `json:"cloud_provider"`    // Cloud provider CRD name.
+	StoragePolicy   StoragePolicy    `json:"storage_policy"`    // Storage Policy used to create volumes.
+	Protocols       Protocols        `json:"protocols"`         // Supported access protocols.
+	Capacity        int64            `json:"capacity"`          // Capacity limit in bytes.
+	Mshards         int64            `json:"mshards"`           // Number of meta shards.
+	Dshards         int64            `json:"dshards"`           // Number of data shards.
+	Export          bool             `json:"export"`            // Whether to export the namespace, i.e. whether mountable.
+	Followers       int64            `json:"followers"`         // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
+	NFSExportConfig *NFSExportConfig `json:"nfs_export_config"` // Configs of nfs-ganesha-export that sfs supports. None if it is not given.
+	UserDescription string           `json:"user_description"`  // User-defined description.
 }
 
 type StoragePolicy struct {
@@ -174,18 +174,18 @@ type Protocols struct {
 }
 
 type NFSExportConfig struct {
-	SECType           SECType           `json:"sec_type"`        // User authorization managemennt.
+	SecType           SecType           `json:"sec_type"`        // User authorization managemennt.
 	Squash            SquashType        `json:"squash"`          // RootSquash, NoRootSquash or AllSquash.
 	AnonymousUserInfo AnonymousUserInfo `json:"anony_user_info"` // Anonymous user info.
 	AccessConfig      AccessConfig      `json:"access_config"`   // Access management.
 }
 
 // User authorization managemennt.
-type SECType string
+type SecType string
 
 const (
-	SECTypeNone SECType = "None"
-	SECTypeSys  SECType = "Sys"
+	SecTypeNone SecType = "None"
+	SecTypeSys  SecType = "Sys"
 )
 
 // RootSquash, NoRootSquash or AllSquash, default is RootSquash.
@@ -205,8 +205,8 @@ type AnonymousUserInfo struct {
 
 // Access management.
 type AccessConfig struct {
-	DefaultAccessType  AccessType   `json:"default_access_type"`  // Default access type.
-	SpecialAccessRules []AccessRule `json:"special_access_rules"` // Rules that diff with `default_access_type`, so access_type in special rules must not be; the same with `default_access_type`.
+	DefaultAccessType  AccessType   `json:"default_access_type"`            // Default access type.
+	SpecialAccessRules []AccessRule `json:"special_access_rules,omitempty"` // Rules that diff with `default_access_type`, so access_type in special rules must not be; the same with `default_access_type`.
 }
 
 type AccessRule struct {
@@ -242,11 +242,11 @@ const (
 
 // NamespaceStatus defines the observed state of Namespace.
 type NamespaceStatus struct {
-	DshardIDS    []int64        `json:"dshard_ids"`    // Data shards assigned to this namespace.
-	ExportStatus NsExportStatus `json:"export_status"` // Export status.
-	MshardIDS    []int64        `json:"mshard_ids"`    // Meta shards assigned to this namespace.
-	Nsid         int64          `json:"nsid"`          // Cluster wide exclusive ID allocated by the ns_manager.
-	State        NsState        `json:"state"`         // Namespace FSM state.
+	DshardIDS    []int64        `json:"dshard_ids,omitempty"` // Data shards assigned to this namespace.
+	ExportStatus NsExportStatus `json:"export_status"`        // Export status.
+	MshardIDS    []int64        `json:"mshard_ids,omitempty"` // Meta shards assigned to this namespace.
+	Nsid         int64          `json:"nsid"`                 // Cluster wide exclusive ID allocated by the ns_manager.
+	State        NsState        `json:"state"`                // Namespace FSM state.
 }
 
 // Export status.
@@ -290,23 +290,22 @@ type NodeList struct {
 
 // NodeSpec defines the desired state of Node.
 type NodeSpec struct {
-	AgentServer *string           `json:"agent_server"`          // If there is an agent on this node: ip+port.
-	DataServer  *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
-	DataShards  map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	MetaServer  *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
-	MetaShards  map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	NodeUUID    *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
-	Online      bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
+	DataServer *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
+	DataShards map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	MetaServer *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
+	MetaShards map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	NodeUUID   *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
+	Online     bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
 }
 
 // NodeStatus defines the observed state of Node.
 type NodeStatus struct {
-	DataShards map[string]string `json:"data_shards"` // Mounted data shards. shard_id -> volume_name:volume_target_path NB: this indicates the; mount status of a shard on this node, but does not mean if it should be attached or; detached. Only shard leader should be attached.
-	DataStatus *bool             `json:"data_status"` // Whether DS is healthy when there is a DS on this node: Data server status updated by this; node agent
-	LastActive *string           `json:"last_active"` // Node level status Last heartbeat updated by agent
-	MetaShards map[string]string `json:"meta_shards"` // Mounted meta shards. shard_id -> volume_name:volume_target_path NB: this indicates the; mount status of a shard on this node, but does not mean if it should be attached or; detached. Only shard leader should be attached.
-	MetaStatus *bool             `json:"meta_status"` // Whether MDS is healthy when there is a MDS on this node: Meta server status updated by; this node agent
-	Score      int64             `json:"score"`       // Load of the node.
+	DataShards map[string]string `json:"data_shards,omitempty"` // Mounted data shards. shard_id -> volume_name:volume_target_path NB: this indicates the; mount status of a shard on this node, but does not mean if it should be attached or; detached. Only shard leader should be attached.
+	DataStatus *bool             `json:"data_status"`           // Whether DS is healthy when there is a DS on this node: Data server status updated by this; node agent
+	LastActive *string           `json:"last_active"`           // Node level status Last heartbeat updated by agent
+	MetaShards map[string]string `json:"meta_shards,omitempty"` // Mounted meta shards. shard_id -> volume_name:volume_target_path NB: this indicates the; mount status of a shard on this node, but does not mean if it should be attached or; detached. Only shard leader should be attached.
+	MetaStatus *bool             `json:"meta_status"`           // Whether MDS is healthy when there is a MDS on this node: Meta server status updated by; this node agent
+	Score      int64             `json:"score"`                 // Load of the node.
 }
 
 // +genclient
@@ -330,10 +329,10 @@ type RecoveryDatabaseList struct {
 
 // RecoveryDatabaseSpec defines the desired state of RecoveryDatabase.
 type RecoveryDatabaseSpec struct {
-	Clids           map[string]string   `json:"clids"`            // Client entry records, clientid -> cid_recov_tag.
-	ReclaimingClids []int64             `json:"reclaiming_clids"` // Reclaiming client entry records, clientid -> cid_recov_tag.
-	Rfhs            map[string][]string `json:"rfhs"`             // Revoked file handle records, cid_recov_tag -> Vec<revoked file handle>.
-	Version         int64               `json:"version"`          // Version number.
+	Clids           map[string]string   `json:"clids,omitempty"`            // Client entry records, clientid -> cid_recov_tag.
+	ReclaimingClids []int64             `json:"reclaiming_clids,omitempty"` // Reclaiming client entry records, clientid -> cid_recov_tag.
+	Rfhs            map[string][]string `json:"rfhs,omitempty"`             // Revoked file handle records, cid_recov_tag -> Vec<revoked file handle>. NOTE: `[]string` must be initialized instead of `nil`.
+	Version         int64               `json:"version"`                    // Version number.
 }
 
 // +genclient
@@ -425,11 +424,11 @@ type NsReference struct {
 
 // ShardStatus defines the observed state of Shard.
 type ShardStatus struct {
-	VolumeName    *string  `json:"volume_name,omitempty"` // On-premise storage.
-	VolumeCreated bool     `json:"volume_created"`        // Backend volume is created.
-	HAMembers     []string `json:"ha_members,omitempty"`  // HA group members, using `node_name` as identity.
-	NodeName      *string  `json:"node_name,omitempty"`   // Which node updated the status.
-	Exported      bool     `json:"exported"`              // If this shard is exported.
+	VolumeName    *string  `json:"volume_name"`    // On-premise storage.
+	VolumeCreated bool     `json:"volume_created"` // Backend volume is created.
+	HAMembers     []string `json:"ha_members"`     // HA group members, using `node_name` as identity.
+	NodeName      *string  `json:"node_name"`      // Which node updated the status.
+	Exported      bool     `json:"exported"`       // If this shard is exported.
 }
 
 // +genclient
