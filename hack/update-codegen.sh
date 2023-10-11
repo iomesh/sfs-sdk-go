@@ -37,8 +37,11 @@ kube::codegen::gen_helpers \
     --boilerplate "${BOILERPLATE}"
 
 mkdir -p "${OUTPUT_BASE}/${OUTPUT_PKG_ROOT}/clientset"
+mkdir -p "${OUTPUT_BASE}/${OUTPUT_PKG_ROOT}/listers"
+mkdir -p "${OUTPUT_BASE}/${OUTPUT_PKG_ROOT}/informers"
 
 kube::codegen::gen_client \
+    --with-watch \
     --input-pkg-root "${INPUT_PKG_ROOT}" \
     --output-pkg-root "${OUTPUT_PKG_ROOT}" \
     --output-base "${OUTPUT_BASE}" \
