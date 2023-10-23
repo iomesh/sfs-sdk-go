@@ -50,9 +50,9 @@ type CloudProviderSpec struct {
 type StorageType string
 
 const (
-	StorageTypeELF   StorageType = "elf"
-	StorageTypeIscsi StorageType = "iscsi"
-	StorageTypeLocal StorageType = "local"
+	StorageTypeELF   StorageType = "Elf"
+	StorageTypeIscsi StorageType = "Iscsi"
+	StorageTypeLocal StorageType = "Local"
 )
 
 // +genclient
