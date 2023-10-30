@@ -28,6 +28,8 @@ type NamespaceExpansion interface{}
 
 type NodeExpansion interface{}
 
+type NodeHealthExpansion interface{}
+
 type RecoveryDatabaseExpansion interface{}
 
 type SessionExpansion interface{}

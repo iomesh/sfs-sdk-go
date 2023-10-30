@@ -34,6 +34,8 @@ type Interface interface {
 	Namespaces() NamespaceInformer
 	// Nodes returns a NodeInformer.
 	Nodes() NodeInformer
+	// NodeHealths returns a NodeHealthInformer.
+	NodeHealths() NodeHealthInformer
 	// RecoveryDatabases returns a RecoveryDatabaseInformer.
 	RecoveryDatabases() RecoveryDatabaseInformer
 	// Sessions returns a SessionInformer.
@@ -80,6 +82,11 @@ func (v *version) Namespaces() NamespaceInformer {
 // Nodes returns a NodeInformer.
 func (v *version) Nodes() NodeInformer {
 	return &nodeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// NodeHealths returns a NodeHealthInformer.
+func (v *version) NodeHealths() NodeHealthInformer {
+	return &nodeHealthInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // RecoveryDatabases returns a RecoveryDatabaseInformer.

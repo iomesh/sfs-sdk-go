@@ -58,6 +58,14 @@ type NodeListerExpansion interface{}
 // NodeNamespaceLister.
 type NodeNamespaceListerExpansion interface{}
 
+// NodeHealthListerExpansion allows custom methods to be added to
+// NodeHealthLister.
+type NodeHealthListerExpansion interface{}
+
+// NodeHealthNamespaceListerExpansion allows custom methods to be added to
+// NodeHealthNamespaceLister.
+type NodeHealthNamespaceListerExpansion interface{}
+
 // RecoveryDatabaseListerExpansion allows custom methods to be added to
 // RecoveryDatabaseLister.
 type RecoveryDatabaseListerExpansion interface{}
