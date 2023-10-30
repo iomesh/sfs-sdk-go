@@ -309,6 +309,33 @@ type NodeStatus struct {
 }
 
 // +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+type NodeHealth struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NodeHealthSpec   `json:"spec,omitempty"`
+	Status NodeHealthStatus `json:"status,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+type NodeHealthList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []NodeHealth `json:"items"`
+}
+
+type NodeHealthSpec struct {
+	NodeName string `json:"node_name"`
+}
+
+type NodeHealthStatus struct {
+	DataService *bool   `json:"data_service"`
+	MetaService *bool   `json:"meta_service"`
+	RenewTime   *string `json:"renew_time"`
+}
+
+// +genclient
 // +genclient:noStatus
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // RecoveryDatabase is the Schema for the recoverydatabases API.
