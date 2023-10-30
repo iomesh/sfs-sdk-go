@@ -48,6 +48,10 @@ func (c *FakeSfsV1) Nodes(namespace string) v1.NodeInterface {
 	return &FakeNodes{c, namespace}
 }
 
+func (c *FakeSfsV1) NodeHealths(namespace string) v1.NodeHealthInterface {
+	return &FakeNodeHealths{c, namespace}
+}
+
 func (c *FakeSfsV1) RecoveryDatabases(namespace string) v1.RecoveryDatabaseInterface {
 	return &FakeRecoveryDatabases{c, namespace}
 }
