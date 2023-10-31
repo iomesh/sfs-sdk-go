@@ -66,6 +66,14 @@ type RecoveryDatabaseListerExpansion interface{}
 // RecoveryDatabaseNamespaceLister.
 type RecoveryDatabaseNamespaceListerExpansion interface{}
 
+// RouteListerExpansion allows custom methods to be added to
+// RouteLister.
+type RouteListerExpansion interface{}
+
+// RouteNamespaceListerExpansion allows custom methods to be added to
+// RouteNamespaceLister.
+type RouteNamespaceListerExpansion interface{}
+
 // SessionListerExpansion allows custom methods to be added to
 // SessionLister.
 type SessionListerExpansion interface{}

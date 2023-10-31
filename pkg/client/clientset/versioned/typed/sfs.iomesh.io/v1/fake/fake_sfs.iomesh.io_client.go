@@ -52,6 +52,10 @@ func (c *FakeSfsV1) RecoveryDatabases(namespace string) v1.RecoveryDatabaseInter
 	return &FakeRecoveryDatabases{c, namespace}
 }
 
+func (c *FakeSfsV1) Routes(namespace string) v1.RouteInterface {
+	return &FakeRoutes{c, namespace}
+}
+
 func (c *FakeSfsV1) Sessions(namespace string) v1.SessionInterface {
 	return &FakeSessions{c, namespace}
 }

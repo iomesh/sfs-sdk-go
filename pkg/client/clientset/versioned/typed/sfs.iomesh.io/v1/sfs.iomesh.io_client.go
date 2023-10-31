@@ -34,6 +34,7 @@ type SfsV1Interface interface {
 	NamespacesGetter
 	NodesGetter
 	RecoveryDatabasesGetter
+	RoutesGetter
 	SessionsGetter
 	ShardsGetter
 	VipsGetter
@@ -67,6 +68,10 @@ func (c *SfsV1Client) Nodes(namespace string) NodeInterface {
 
 func (c *SfsV1Client) RecoveryDatabases(namespace string) RecoveryDatabaseInterface {
 	return newRecoveryDatabases(c, namespace)
+}
+
+func (c *SfsV1Client) Routes(namespace string) RouteInterface {
+	return newRoutes(c, namespace)
 }
 
 func (c *SfsV1Client) Sessions(namespace string) SessionInterface {

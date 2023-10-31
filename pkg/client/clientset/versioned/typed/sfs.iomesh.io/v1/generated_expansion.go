@@ -30,6 +30,8 @@ type NodeExpansion interface{}
 
 type RecoveryDatabaseExpansion interface{}
 
+type RouteExpansion interface{}
+
 type SessionExpansion interface{}
 
 type ShardExpansion interface{}

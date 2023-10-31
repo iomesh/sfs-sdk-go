@@ -36,6 +36,8 @@ type Interface interface {
 	Nodes() NodeInformer
 	// RecoveryDatabases returns a RecoveryDatabaseInformer.
 	RecoveryDatabases() RecoveryDatabaseInformer
+	// Routes returns a RouteInformer.
+	Routes() RouteInformer
 	// Sessions returns a SessionInformer.
 	Sessions() SessionInformer
 	// Shards returns a ShardInformer.
@@ -85,6 +87,11 @@ func (v *version) Nodes() NodeInformer {
 // RecoveryDatabases returns a RecoveryDatabaseInformer.
 func (v *version) RecoveryDatabases() RecoveryDatabaseInformer {
 	return &recoveryDatabaseInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Routes returns a RouteInformer.
+func (v *version) Routes() RouteInformer {
+	return &routeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Sessions returns a SessionInformer.
