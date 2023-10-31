@@ -65,6 +65,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Nodes().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("recoverydatabases"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().RecoveryDatabases().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("routes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Routes().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("sessions"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Sessions().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("shards"):

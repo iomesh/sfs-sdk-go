@@ -361,6 +361,12 @@ type SessionSpec struct {
 	ProtocolAddr string            `json:"protocol_addr"`  // Exposed <ip:port>.
 	ClientAddr   string            `json:"client_addr"`    // Exposed <ip:port>.
 	Vips         map[string]string `json:"vips,omitempty"` // VIP list assigned to this session.
+	// MAC address of the network interface to which vips should be attached. If None, vips will
+	// be attached to the best matching network interface, i.e. the one with the longest netmask
+	// prefix length.
+	MACAddr []int64 `json:"mac_addr,omitempty"`
+	// Slash-notation of netmask, i.e. prefix_len.
+	Netmask *int64 `json:"netmask,omitempty"`
 }
 
 // Session type, e.g. nfs, fuse and etc.
@@ -487,4 +493,37 @@ type VolumeSpec struct {
 	ShardID       int64       `json:"shard_id"`       // Shard that this volume is assigned.
 	ShardType     ShardType   `json:"shard_type"`     // Shard type, Meta or Data.
 	Size          int64       `json:"size"`           // Volume size in bytes
+}
+
+// +genclient
+// +genclient:noStatus
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// Route is the Schema for the routes API.
+type Route struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec RouteSpec `json:"spec,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// RouteList contains a list of Route.
+type RouteList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Route `json:"items"`
+}
+
+// RouteSpec defines the desired state of Route.
+type RouteSpec struct {
+	Routes []RouteInfo `json:"routes"`
+}
+
+type RouteInfo struct {
+	// The destination network.
+	Destination string `json:"destination"`
+	// The gateway address.
+	Gateway string `json:"gateway"`
+	// Netmask for the destination net.
+	Genmask int64 `json:"genmask"`
 }

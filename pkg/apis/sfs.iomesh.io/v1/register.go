@@ -70,6 +70,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VolumeList{},
 		&Metric{},
 		&MetricList{},
+		&Route{},
+		&RouteList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
