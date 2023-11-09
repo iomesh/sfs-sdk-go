@@ -76,6 +76,7 @@ type ClusterList struct {
 
 // ClusterSpec defines the desired state of Cluster.
 type ClusterSpec struct {
+	Capacity      int64 `json:"capacity"`        // Cluster capacity in bytes, updated by sfs-operator
 	NextNsid      int64 `json:"next_nsid"`       // Next available ns id in this cluster
 	NextSessionID int64 `json:"next_session_id"` // Next available session id in this cluster
 	NextShardid   int64 `json:"next_shardid"`    // Next available shard id in this cluster
@@ -158,7 +159,7 @@ type NamespaceSpec struct {
 	Dshards         int64            `json:"dshards"`           // Number of data shards.
 	Export          bool             `json:"export"`            // Whether to export the namespace, i.e. whether mountable.
 	Followers       int64            `json:"followers"`         // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
-	NFSExportConfig *NFSExportConfig `json:"nfs_export_config"` // Configs of nfs-ganesha-export that sfs supports. None if it is not given.
+	NFSExportConfig *NFSExportConfig `json:"nfs_export_config"` // Configs of nfs-ganesha-export that sfs supports. It takes effect if NFS is supported and if none, default values are used.
 	UserDescription string           `json:"user_description"`  // User-defined description.
 }
 
