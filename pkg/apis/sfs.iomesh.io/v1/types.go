@@ -395,6 +395,10 @@ type SessionSpec struct {
 	MACAddr []int64 `json:"mac_addr,omitempty"`
 	// Slash-notation of netmask, i.e. prefix_len.
 	Netmask *int64 `json:"netmask,omitempty"`
+    // Namespace_ids that need be exported by this NFS session, updated by namespace controller
+	// in sfs-manager. Hash of nfs_export_config is used by sfs-manager to quickly deliver
+	// change of nfs_export_config to ganesha.
+    NFSNeedExportNSS  map[string]int64  `json:"nfs_need_export_nss,omitempty"`
 }
 
 // Session type, e.g. nfs, fuse and etc.
@@ -407,7 +411,8 @@ const (
 
 // SessionStatus defines the observed state of Session.
 type SessionStatus struct {
-	SessionID int64 `json:"session_id"` // Cluster wide exclusive ID.
+	SessionID       int64               `json:"session_id"` // Cluster wide exclusive ID.
+	NFSExportPaths  map[string][]string `json:"nfs_export_paths,omitempty"` // Ns_name -> export_paths, updated by session controller in sfs-agent.
 }
 
 // +genclient
