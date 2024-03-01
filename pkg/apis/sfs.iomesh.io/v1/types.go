@@ -76,10 +76,11 @@ type ClusterList struct {
 
 // ClusterSpec defines the desired state of Cluster.
 type ClusterSpec struct {
-	Capacity      int64 `json:"capacity"`        // Cluster capacity in bytes, updated by sfs-operator
-	NextNsid      int64 `json:"next_nsid"`       // Next available ns id in this cluster
-	NextSessionID int64 `json:"next_session_id"` // Next available session id in this cluster
-	NextShardid   int64 `json:"next_shardid"`    // Next available shard id in this cluster
+	ClusterID     string `json:"cluster_id,omitempty"` // Cluster id, updated by sfs-operator
+	Capacity      int64  `json:"capacity"`             // Cluster capacity in bytes, updated by sfs-operator
+	NextNsid      int64  `json:"next_nsid"`            // Next available ns id in this cluster
+	NextSessionID int64  `json:"next_session_id"`      // Next available session id in this cluster
+	NextShardid   int64  `json:"next_shardid"`         // Next available shard id in this cluster
 }
 
 // +genclient
@@ -395,10 +396,10 @@ type SessionSpec struct {
 	MACAddr []int64 `json:"mac_addr,omitempty"`
 	// Slash-notation of netmask, i.e. prefix_len.
 	Netmask *int64 `json:"netmask,omitempty"`
-    // Namespace_ids that need be exported by this NFS session, updated by namespace controller
+	// Namespace_ids that need be exported by this NFS session, updated by namespace controller
 	// in sfs-manager. Hash of nfs_export_config is used by sfs-manager to quickly deliver
 	// change of nfs_export_config to ganesha.
-    NFSNeedExportNSS  map[string]int64  `json:"nfs_need_export_nss,omitempty"`
+	NFSNeedExportNSS map[string]int64 `json:"nfs_need_export_nss,omitempty"`
 }
 
 // Session type, e.g. nfs, fuse and etc.
@@ -411,8 +412,8 @@ const (
 
 // SessionStatus defines the observed state of Session.
 type SessionStatus struct {
-	SessionID       int64               `json:"session_id"` // Cluster wide exclusive ID.
-	NFSExportPaths  map[string][]string `json:"nfs_export_paths,omitempty"` // Ns_name -> export_paths, updated by session controller in sfs-agent.
+	SessionID      int64               `json:"session_id"`                 // Cluster wide exclusive ID.
+	NFSExportPaths map[string][]string `json:"nfs_export_paths,omitempty"` // Ns_name -> export_paths, updated by session controller in sfs-agent.
 }
 
 // +genclient
