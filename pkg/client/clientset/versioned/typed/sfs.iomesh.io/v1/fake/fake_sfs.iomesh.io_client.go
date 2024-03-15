@@ -36,6 +36,10 @@ func (c *FakeSfsV1) Clusters(namespace string) v1.ClusterInterface {
 	return &FakeClusters{c, namespace}
 }
 
+func (c *FakeSfsV1) Licenses(namespace string) v1.LicenseInterface {
+	return &FakeLicenses{c, namespace}
+}
+
 func (c *FakeSfsV1) Metrics(namespace string) v1.MetricInterface {
 	return &FakeMetrics{c, namespace}
 }

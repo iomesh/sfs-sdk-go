@@ -54,6 +54,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&CloudProviderList{},
 		&Cluster{},
 		&ClusterList{},
+		&License{},
+		&LicenseList{},
 		&Namespace{},
 		&NamespaceList{},
 		&Node{},

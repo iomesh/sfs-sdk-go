@@ -57,6 +57,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().CloudProviders().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("clusters"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Clusters().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("licenses"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Licenses().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("metrics"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sfs().V1().Metrics().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("namespaces"):

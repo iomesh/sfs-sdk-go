@@ -34,6 +34,14 @@ type ClusterListerExpansion interface{}
 // ClusterNamespaceLister.
 type ClusterNamespaceListerExpansion interface{}
 
+// LicenseListerExpansion allows custom methods to be added to
+// LicenseLister.
+type LicenseListerExpansion interface{}
+
+// LicenseNamespaceListerExpansion allows custom methods to be added to
+// LicenseNamespaceLister.
+type LicenseNamespaceListerExpansion interface{}
+
 // MetricListerExpansion allows custom methods to be added to
 // MetricLister.
 type MetricListerExpansion interface{}
