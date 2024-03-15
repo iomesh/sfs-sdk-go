@@ -30,6 +30,7 @@ type SfsV1Interface interface {
 	RESTClient() rest.Interface
 	CloudProvidersGetter
 	ClustersGetter
+	LicensesGetter
 	MetricsGetter
 	NamespacesGetter
 	NodesGetter
@@ -53,6 +54,10 @@ func (c *SfsV1Client) CloudProviders(namespace string) CloudProviderInterface {
 
 func (c *SfsV1Client) Clusters(namespace string) ClusterInterface {
 	return newClusters(c, namespace)
+}
+
+func (c *SfsV1Client) Licenses(namespace string) LicenseInterface {
+	return newLicenses(c, namespace)
 }
 
 func (c *SfsV1Client) Metrics(namespace string) MetricInterface {

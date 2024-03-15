@@ -85,6 +85,75 @@ type ClusterSpec struct {
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// License is the Schema for the License API.
+type License struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   LicenseSpec   `json:"spec,omitempty"`
+	Status LicenseStatus `json:"status,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// LicenseList contains a list of License.
+type LicenseList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []License `json:"items"`
+}
+
+// LicenseSpec defines the desired state of License.
+type LicenseSpec struct {
+	// The raw license code provided by SmartX. `None` means trial license.
+	Code *string `json:"code"`
+}
+
+// LicenseStatus defines the observed state of License.
+type LicenseStatus struct {
+	// The license expiration date.
+	ExpireDate metav1.Time `json:"expire_date"`
+	// The license information.
+	Info *LicenseInfo `json:"info"`
+	// The total used capacity of SFS.
+	UsedCapacity uint64 `json:"used_capacity"`
+	// The license code is verified.
+	Valid bool `json:"valid"`
+}
+
+type LicenseInfo struct {
+	// The license type.
+	LicenseType LicenseType `json:"license_type"`
+	// The maximum allowed capacity.
+	MaxCapacity uint64 `json:"max_capacity"`
+	// The license valid period.
+	Period metav1.Duration `json:"period"`
+	// The serial number of the product instance to which this license can apply.
+	SerialNumber string `json:"serial_number"`
+	// The license signed date.
+	SignDate metav1.Time `json:"sign_date"`
+	// The product edition.
+	SoftwareEdition SoftwareEdition `json:"software_edition"`
+}
+
+// The license type.
+type LicenseType string
+
+const (
+	LicenseTypePerpetual    LicenseType = "Perpetual"
+	LicenseTypeSubscription LicenseType = "Subscription"
+	LicenseTypeTrial        LicenseType = "Trial"
+)
+
+// The product edition.
+type SoftwareEdition string
+
+const (
+	SoftwareEditionEnterprise SoftwareEdition = "Enterprise"
+	SoftwareEditionStandard   SoftwareEdition = "Standard"
+)
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // Metric is the Schema for the Metrics API.
 type Metric struct {
 	metav1.TypeMeta   `json:",inline"`

@@ -28,6 +28,8 @@ type Interface interface {
 	CloudProviders() CloudProviderInformer
 	// Clusters returns a ClusterInformer.
 	Clusters() ClusterInformer
+	// Licenses returns a LicenseInformer.
+	Licenses() LicenseInformer
 	// Metrics returns a MetricInformer.
 	Metrics() MetricInformer
 	// Namespaces returns a NamespaceInformer.
@@ -69,6 +71,11 @@ func (v *version) CloudProviders() CloudProviderInformer {
 // Clusters returns a ClusterInformer.
 func (v *version) Clusters() ClusterInformer {
 	return &clusterInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// Licenses returns a LicenseInformer.
+func (v *version) Licenses() LicenseInformer {
+	return &licenseInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Metrics returns a MetricInformer.
