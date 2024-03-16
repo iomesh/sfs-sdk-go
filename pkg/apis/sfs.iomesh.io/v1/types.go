@@ -110,8 +110,6 @@ type LicenseSpec struct {
 
 // LicenseStatus defines the observed state of License.
 type LicenseStatus struct {
-	// The license expiration date.
-	ExpireDate metav1.Time `json:"expire_date"`
 	// The license information.
 	Info *LicenseInfo `json:"info"`
 	// The total used capacity of SFS.
