@@ -90,8 +90,9 @@ type License struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   LicenseSpec   `json:"spec,omitempty"`
-	Status LicenseStatus `json:"status,omitempty"`
+	Spec LicenseSpec `json:"spec,omitempty"`
+	// +optional
+	Status *LicenseStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -205,8 +206,9 @@ type Namespace struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   NamespaceSpec   `json:"spec,omitempty"`
-	Status NamespaceStatus `json:"status,omitempty"`
+	Spec NamespaceSpec `json:"spec,omitempty"`
+	// +optional
+	Status *NamespaceStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
