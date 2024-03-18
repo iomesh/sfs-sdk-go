@@ -261,7 +261,11 @@ func (in *License) DeepCopyInto(out *License) {
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
-	in.Status.DeepCopyInto(&out.Status)
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(LicenseStatus)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -509,7 +513,11 @@ func (in *Namespace) DeepCopyInto(out *Namespace) {
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
 	in.Spec.DeepCopyInto(&out.Spec)
-	in.Status.DeepCopyInto(&out.Status)
+	if in.Status != nil {
+		in, out := &in.Status, &out.Status
+		*out = new(NamespaceStatus)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
