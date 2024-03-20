@@ -122,14 +122,14 @@ type LicenseStatus struct {
 type LicenseInfo struct {
 	// The license type.
 	LicenseType LicenseType `json:"license_type"`
-	// The maximum allowed capacity.
+	// The maximum allowed capacity, 0 means no limit.
 	MaxCapacity uint64 `json:"max_capacity"`
-	// The license valid period.
-	Period metav1.Duration `json:"period"`
+	// The license valid period in unit seconds.
+	Period uint64 `json:"period"`
 	// The serial number of the product instance to which this license can apply.
 	SerialNumber string `json:"serial_number"`
-	// The license signed date.
-	SignDate metav1.Time `json:"sign_date"`
+	// The license signed date in UNIX timestamp.
+	SignDate uint64 `json:"sign_date"`
 	// The product edition.
 	SoftwareEdition SoftwareEdition `json:"software_edition"`
 }
