@@ -221,16 +221,17 @@ type NamespaceList struct {
 
 // NamespaceSpec defines the desired state of Namespace.
 type NamespaceSpec struct {
-	CloudProvider   string           `json:"cloud_provider"`    // Cloud provider CRD name.
-	StoragePolicy   StoragePolicy    `json:"storage_policy"`    // Storage Policy used to create volumes.
-	Protocols       Protocols        `json:"protocols"`         // Supported access protocols.
-	Capacity        int64            `json:"capacity"`          // Capacity limit in bytes.
-	Mshards         int64            `json:"mshards"`           // Number of meta shards.
-	Dshards         int64            `json:"dshards"`           // Number of data shards.
-	Export          bool             `json:"export"`            // Whether to export the namespace, i.e. whether mountable.
-	Followers       int64            `json:"followers"`         // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
-	NFSExportConfig *NFSExportConfig `json:"nfs_export_config"` // Configs of nfs-ganesha-export that sfs supports. It takes effect if NFS is supported and if none, default values are used.
-	UserDescription string           `json:"user_description"`  // User-defined description.
+	CloudProvider   string           `json:"cloud_provider"`         // Cloud provider CRD name.
+	StoragePolicy   StoragePolicy    `json:"storage_policy"`         // Storage Policy used to create volumes.
+	Protocols       Protocols        `json:"protocols"`              // Supported access protocols.
+	Capacity        int64            `json:"capacity"`               // Capacity limit in bytes.
+	Mshards         int64            `json:"mshards"`                // Number of meta shards.
+	Dshards         int64            `json:"dshards"`                // Number of data shards.
+	Export          bool             `json:"export"`                 // Whether to export the namespace, i.e. whether mountable.
+	Followers       int64            `json:"followers"`              // How many follower nodes for an individual shard when exporting. e.g. for one shard HA; group, there are `1 + followers` nodes.
+	NFSExportConfig *NFSExportConfig `json:"nfs_export_config"`      // Configs of nfs-ganesha-export that sfs supports. It takes effect if NFS is supported and if none, default values are used.
+	UserDescription string           `json:"user_description"`       // User-defined description.
+	PreferNodes     []string         `json:"prefer_nodes,omitempty"` // Preferred leader nodes to which the shards are associated for locality.
 }
 
 type StoragePolicy struct {
@@ -313,11 +314,12 @@ const (
 
 // NamespaceStatus defines the observed state of Namespace.
 type NamespaceStatus struct {
-	DshardIDS    []int64        `json:"dshard_ids,omitempty"` // Data shards assigned to this namespace.
-	ExportStatus NsExportStatus `json:"export_status"`        // Export status.
-	MshardIDS    []int64        `json:"mshard_ids,omitempty"` // Meta shards assigned to this namespace.
-	Nsid         int64          `json:"nsid"`                 // Cluster wide exclusive ID allocated by the ns_manager.
-	State        NsState        `json:"state"`                // Namespace FSM state.
+	Nsid         int64             `json:"nsid"`              // Cluster wide exclusive ID allocated by the ns_manager.
+	State        NsState           `json:"state"`             // Namespace FSM state.
+	Mshards      map[uint32]string `json:"mshards,omitempty"` // Meta shards assigned to this namespace.
+	Dshards      map[uint32]string `json:"dshards,omitempty"` // Data shards assigned to this namespace.
+	Created      bool              `json:"created"`           // If all shards are created.
+	ExportStatus NsExportStatus    `json:"export_status"`     // Export status.
 }
 
 // Export status.
@@ -533,11 +535,14 @@ type NsReference struct {
 
 // ShardStatus defines the observed state of Shard.
 type ShardStatus struct {
-	VolumeName    *string  `json:"volume_name"`    // On-premise storage.
-	VolumeCreated bool     `json:"volume_created"` // Backend volume is created.
-	HAMembers     []string `json:"ha_members"`     // HA group members, using `node_name` as identity.
-	NodeName      *string  `json:"node_name"`      // Which node updated the status.
-	Exported      bool     `json:"exported"`       // If this shard is exported.
+	VolumeName    *string  `json:"volume_name"`        // On-premise storage.
+	VolumeCreated bool     `json:"volume_created"`     // Backend volume is created.
+	VolumeWwn     *string  `json:"volume_wwn"`         // Volume wwn, which can be seen on VM when mounted.
+	HAMembers     []string `json:"ha_members"`         // HA group members, using `node_name` as identity.
+	MountNodes    []string `json:"mount_nodes"`        // Track which nodes have this shard in the spec.
+	NodeName      *string  `json:"node_name"`          // Which node updated the status.
+	Abnormal      bool     `json:"abnormal"`           // Shard leader changes too frequently.
+	Exported      *bool    `json:"exported,omitempty"` // If this shard is exported.
 }
 
 // +genclient
@@ -566,8 +571,10 @@ type VipSpec struct {
 
 // VipStatus defines the observed state of Vip.
 type VipStatus struct {
-	Ready       bool    `json:"ready"`        // If this vip is ready.
-	SessionName *string `json:"session_name"` // Which session this vip is appointed.
+	PreferSession   *string `json:"prefer_session,omitempty"`
+	AssignedSession *string `json:"assigned_session,omitempty"`
+	CurrentSession  *string `json:"current_session,omitempty"` // This field will follow `assigned_session`.
+	Ready           bool    `json:"ready"`                     // If this vip is ready.
 }
 
 // +genclient
@@ -578,7 +585,8 @@ type Volume struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec VolumeSpec `json:"spec,omitempty"`
+	Spec   VolumeSpec   `json:"spec,omitempty"`
+	Status VolumeStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -595,7 +603,13 @@ type VolumeSpec struct {
 	NsReference   NsReference `json:"ns_ref"`         // Reference of the ns that this volume belongs.
 	ShardID       int64       `json:"shard_id"`       // Shard that this volume is assigned.
 	ShardType     ShardType   `json:"shard_type"`     // Shard type, Meta or Data.
-	Size          int64       `json:"size"`           // Volume size in bytes
+	InitialSize   uint64      `json:"initial_size"`
+	MaxSize       uint64      `json:"max_size"`
+	Wwn           string      `json:"wwn,omitempty"`
+}
+
+type VolumeStatus struct {
+	Size uint64 `json:"size"` // Volume size in bytes
 }
 
 // +genclient
