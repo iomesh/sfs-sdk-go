@@ -399,7 +399,8 @@ type NodeHealthList struct {
 }
 
 type NodeHealthSpec struct {
-	NodeName string `json:"node_name"`
+	NodeName    string `json:"node_name"`
+	NodeVersion string `json:"node_version,omitempty"`
 }
 
 type NodeHealthStatus struct {
