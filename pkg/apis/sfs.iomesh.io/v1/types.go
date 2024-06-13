@@ -602,6 +602,7 @@ type VolumeList struct {
 type VolumeSpec struct {
 	CloudProvider string      `json:"cloud_provider"` // Cloud provider name
 	NsReference   NsReference `json:"ns_ref"`         // Reference of the ns that this volume belongs.
+	NsID          int64       `json:"nsid"`           // Namespace that this shard is assigned.
 	ShardID       int64       `json:"shard_id"`       // Shard that this volume is assigned.
 	ShardType     ShardType   `json:"shard_type"`     // Shard type, Meta or Data.
 	InitialSize   uint64      `json:"initial_size"`
