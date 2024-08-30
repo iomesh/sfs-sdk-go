@@ -18,6 +18,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+apigroup="$1"
+
 SCRIPT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 DIFFROOT="${SCRIPT_ROOT}/pkg"
 TMP_DIFFROOT="$(mktemp -d -t "$(basename "$0").XXXXXX")/pkg"
@@ -32,7 +34,7 @@ cleanup
 mkdir -p "${TMP_DIFFROOT}"
 cp -a "${DIFFROOT}"/* "${TMP_DIFFROOT}"
 
-"${SCRIPT_ROOT}/hack/update-codegen.sh"
+"${SCRIPT_ROOT}/hack/update-codegen.sh" ${apigroup}
 echo "diffing ${DIFFROOT} against freshly generated codegen"
 ret=0
 diff -Naupr "${DIFFROOT}" "${TMP_DIFFROOT}" || ret=$?

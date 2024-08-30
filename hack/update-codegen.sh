@@ -18,17 +18,20 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-GROUP_VERSIONS="sfs.iomesh.io:v1"
+apigroup="$1"
 
 MODULE="github.com/iomesh/sfs-sdk-go"
-INPUT_PKG_ROOT="${MODULE}/pkg/apis"
-OUTPUT_PKG_ROOT="${MODULE}/pkg/client"
-SCRIPT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INPUT_PKG_ROOT="${MODULE}/pkg/apis/${apigroup}"
+OUTPUT_PKG_ROOT="${MODULE}/pkg/client/${apigroup}"
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${SCRIPT_ROOT}/.."
 OUTPUT_BASE="${SCRIPT_ROOT}/../../../.."
 BOILERPLATE="${SCRIPT_ROOT}/boilerplate.go.txt"
 
-CODEGEN_PKG="${CODEGEN_PKG:-$(cd ${REPO_ROOT}; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || go list -m -f "{{.Dir}}" k8s.io/code-generator)}"
+CODEGEN_PKG="${CODEGEN_PKG:-$(
+    cd ${REPO_ROOT}
+    ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || go list -m -f "{{.Dir}}" k8s.io/code-generator
+)}"
 source "${CODEGEN_PKG}/kube_codegen.sh"
 
 kube::codegen::gen_helpers \
