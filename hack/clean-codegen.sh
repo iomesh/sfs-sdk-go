@@ -18,16 +18,19 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-GROUP="sfs.iomesh.io"
+GROUP="$1"
 VERSION="v1"
 SCRIPT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$(dirname SCRIPT_ROOT)"
-INPUT_PKG_ROOT="${REPO_ROOT}/pkg/apis"
-OUTPUT_PKG_ROOT="${REPO_ROOT}/pkg/client"
+INPUT_PKG_ROOT="${REPO_ROOT}/pkg/apis/${GROUP}"
+OUTPUT_PKG_ROOT="${REPO_ROOT}/pkg/client/${GROUP}"
 DEEPCOPY_FILE_NAME="zz_generated.deepcopy.go"
 
 echo "remove deepcopy file"
-rm -f "${INPUT_PKG_ROOT}/${GROUP}/${VERSION}/${DEEPCOPY_FILE_NAME}"
+rm -f "${INPUT_PKG_ROOT}/sfs/${VERSION}/${DEEPCOPY_FILE_NAME}"
 
 echo "remove client"
 rm -rf "${OUTPUT_PKG_ROOT}"
+
+echo "remove types"
+rm -rf "${INPUT_PKG_ROOT}/sfs/${VERSION}/types.go"

@@ -58,4 +58,4 @@ jobs:
         go mod tidy
     - name: Verify codegen
       run: |
-        make verify-codegen
+        make verify
