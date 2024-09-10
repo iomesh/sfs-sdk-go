@@ -119,6 +119,8 @@ type LicenseInfo struct {
 	SignDate uint64 `json:"sign_date"`
 	// The product edition.
 	SoftwareEdition SoftwareEdition `json:"software_edition"`
+	// The license vendor, must be SMTX / ARCFRA.
+	Vendor *string `json:"vendor"`
 }
 
 // The license type.
