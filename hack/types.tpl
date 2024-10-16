@@ -352,6 +352,7 @@ type NodeList struct {
 
 // NodeSpec defines the desired state of Node.
 type NodeSpec struct {
+	ManagerServer *string        `json:"manager_server"`        // If there is a Manager on this node: ip+port. Updated by end users.
 	DataServer *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
 	DataShards map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
 	MetaServer *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
