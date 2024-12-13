@@ -63,11 +63,13 @@ type ClusterList struct {
 
 // ClusterSpec defines the desired state of Cluster.
 type ClusterSpec struct {
-	ClusterID     string `json:"cluster_id,omitempty"` // Cluster id, updated by sfs-operator
-	Capacity      int64  `json:"capacity"`             // Cluster capacity in bytes, updated by sfs-operator
-	NextNsid      int64  `json:"next_nsid"`            // Next available ns id in this cluster
-	NextSessionID int64  `json:"next_session_id"`      // Next available session id in this cluster
-	NextShardid   int64  `json:"next_shardid"`         // Next available shard id in this cluster
+	ClusterID              string `json:"cluster_id,omitempty"`     // Cluster id, updated by sfs-operator
+	Capacity               int64  `json:"capacity"`                 // Cluster capacity in bytes, updated by sfs-operator
+	EnableLeaseServer      bool   `json:"enable_lease_server"`      // Whether to enable manager lease server
+	EnforceReclaimingClids bool   `json:"enforce_reclaiming_clids"` // Whether to enforce reclaiming clids
+	NextNsid               int64  `json:"next_nsid"`                // Next available ns id in this cluster
+	NextSessionID          int64  `json:"next_session_id"`          // Next available session id in this cluster
+	NextShardid            int64  `json:"next_shardid"`             // Next available shard id in this cluster
 }
 
 // +genclient
@@ -352,13 +354,13 @@ type NodeList struct {
 
 // NodeSpec defines the desired state of Node.
 type NodeSpec struct {
-	ManagerServer *string        `json:"manager_server"`        // If there is a Manager on this node: ip+port. Updated by end users.
-	DataServer *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
-	DataShards map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	MetaServer *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
-	MetaShards map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	NodeUUID   *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
-	Online     bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
+	ManagerServer *string           `json:"manager_server"`        // If there is a Manager on this node: ip+port. Updated by end users.
+	DataServer    *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
+	DataShards    map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	MetaServer    *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
+	MetaShards    map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	NodeUUID      *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
+	Online        bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
 }
 
 // NodeStatus defines the observed state of Node.
