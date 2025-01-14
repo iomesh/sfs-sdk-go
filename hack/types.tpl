@@ -333,6 +333,12 @@ const (
 	NsStateDeleting     NsState = "Deleting"
 )
 
+const (
+	KUBE_NODE_LABEL   = "kube-node"
+	MASTER_NODE_LABEL = "master-node"
+	COMMON_NODE_LABEL = "common-node"
+)
+
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // Node is the Schema for the nodes API.
@@ -636,4 +642,36 @@ type RouteInfo struct {
 	Gateway string `json:"gateway"`
 	// Netmask for the destination net.
 	Genmask int64 `json:"genmask"`
+}
+
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// ManagementVip is the Schema for the management vips API.
+type ManagementVip struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   ManagementVipSpec   `json:"spec,omitempty"`
+	Status ManagementVipStatus `json:"status,omitempty"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// ManagementVipList contains a list of ManagementVip.
+type ManagementVipList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ManagementVip `json:"items"`
+}
+
+// ManagementVipSpec defines the desired state of ManagementVip.
+type ManagementVipSpec struct {
+	Addr    string `json:"addr"`    // The ipv4 addr.
+	Gateway string `json:"gateway"` // The ipv4 gateway addr.
+}
+
+// ManagementVipStatus defines the observed state of ManagementVip.
+type ManagementVipStatus struct {
+	AssignedNode *string `json:"assigned_node,omitempty"`
+	CurrentNode  *string `json:"current_node,omitempty"` // This field will follow `assigned_nod`.
+	Ready        bool    `json:"ready"`                  // If this management vip is ready.
 }
