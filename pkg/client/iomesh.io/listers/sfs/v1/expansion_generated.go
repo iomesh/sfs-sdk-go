@@ -42,6 +42,14 @@ type LicenseListerExpansion interface{}
 // LicenseNamespaceLister.
 type LicenseNamespaceListerExpansion interface{}
 
+// ManagementVipListerExpansion allows custom methods to be added to
+// ManagementVipLister.
+type ManagementVipListerExpansion interface{}
+
+// ManagementVipNamespaceListerExpansion allows custom methods to be added to
+// ManagementVipNamespaceLister.
+type ManagementVipNamespaceListerExpansion interface{}
+
 // MetricListerExpansion allows custom methods to be added to
 // MetricLister.
 type MetricListerExpansion interface{}

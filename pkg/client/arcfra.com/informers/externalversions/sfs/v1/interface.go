@@ -30,6 +30,8 @@ type Interface interface {
 	Clusters() ClusterInformer
 	// Licenses returns a LicenseInformer.
 	Licenses() LicenseInformer
+	// ManagementVips returns a ManagementVipInformer.
+	ManagementVips() ManagementVipInformer
 	// Metrics returns a MetricInformer.
 	Metrics() MetricInformer
 	// Namespaces returns a NamespaceInformer.
@@ -76,6 +78,11 @@ func (v *version) Clusters() ClusterInformer {
 // Licenses returns a LicenseInformer.
 func (v *version) Licenses() LicenseInformer {
 	return &licenseInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// ManagementVips returns a ManagementVipInformer.
+func (v *version) ManagementVips() ManagementVipInformer {
+	return &managementVipInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Metrics returns a MetricInformer.

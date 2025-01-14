@@ -31,6 +31,7 @@ type SfsV1Interface interface {
 	CloudProvidersGetter
 	ClustersGetter
 	LicensesGetter
+	ManagementVipsGetter
 	MetricsGetter
 	NamespacesGetter
 	NodesGetter
@@ -58,6 +59,10 @@ func (c *SfsV1Client) Clusters(namespace string) ClusterInterface {
 
 func (c *SfsV1Client) Licenses(namespace string) LicenseInterface {
 	return newLicenses(c, namespace)
+}
+
+func (c *SfsV1Client) ManagementVips(namespace string) ManagementVipInterface {
+	return newManagementVips(c, namespace)
 }
 
 func (c *SfsV1Client) Metrics(namespace string) MetricInterface {

@@ -24,6 +24,8 @@ type ClusterExpansion interface{}
 
 type LicenseExpansion interface{}
 
+type ManagementVipExpansion interface{}
+
 type MetricExpansion interface{}
 
 type NamespaceExpansion interface{}
