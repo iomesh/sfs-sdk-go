@@ -354,13 +354,14 @@ type NodeList struct {
 
 // NodeSpec defines the desired state of Node.
 type NodeSpec struct {
-	ManagerServer *string           `json:"manager_server"`        // If there is a Manager on this node: ip+port. Updated by end users.
-	DataServer    *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
-	DataShards    map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	MetaServer    *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
-	MetaShards    map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
-	NodeUUID      *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
-	Online        bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
+	ManagerServer    *string           `json:"manager_server"`        // If there is a Manager on this node: ip+port. Updated by end users.
+	DataServer       *string           `json:"data_server"`           // If there is a DS on this node: ip+port. Updated by end users.
+	DataShards       map[string]string `json:"data_shards,omitempty"` // Data shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	MetaServer       *string           `json:"meta_server"`           // If there is a MDS on this node: ip+port. Updated by end users.
+	MetaShards       map[string]string `json:"meta_shards,omitempty"` // Meta shards that should be exported on this node. shard_id -> volume name Updated by; shard controller.
+	NodeUUID         *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
+	Online           bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
+	DisableAutoStart bool              `json:"disable_auto_start,omitempty"`
 }
 
 // NodeStatus defines the observed state of Node.
