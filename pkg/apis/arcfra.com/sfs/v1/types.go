@@ -76,15 +76,23 @@ type ClusterList struct {
 	Items           []Cluster `json:"items"`
 }
 
+type FeatureFlag string
+
+const (
+	AgentHeartbeatWithGanesha FeatureFlag = "AgentHeartbeatWithGanesha"
+	DecreaseShardLeaseTime    FeatureFlag = "DecreaseShardLeaseTime"
+)
+
 // ClusterSpec defines the desired state of Cluster.
 type ClusterSpec struct {
-	ClusterID              string `json:"cluster_id,omitempty"`     // Cluster id, updated by sfs-operator
-	Capacity               int64  `json:"capacity"`                 // Cluster capacity in bytes, updated by sfs-operator
-	EnableLeaseServer      bool   `json:"enable_lease_server"`      // Whether to enable manager lease server
-	EnforceReclaimingClids bool   `json:"enforce_reclaiming_clids"` // Whether to enforce reclaiming clids
-	NextNsid               int64  `json:"next_nsid"`                // Next available ns id in this cluster
-	NextSessionID          int64  `json:"next_session_id"`          // Next available session id in this cluster
-	NextShardid            int64  `json:"next_shardid"`             // Next available shard id in this cluster
+	ClusterID              string        `json:"cluster_id,omitempty"`     // Cluster id, updated by sfs-operator
+	Capacity               int64         `json:"capacity"`                 // Cluster capacity in bytes, updated by sfs-operator
+	EnableLeaseServer      bool          `json:"enable_lease_server"`      // Whether to enable manager lease server
+	EnforceReclaimingClids bool          `json:"enforce_reclaiming_clids"` // Whether to enforce reclaiming clids
+	NextNsid               int64         `json:"next_nsid"`                // Next available ns id in this cluster
+	NextSessionID          int64         `json:"next_session_id"`          // Next available session id in this cluster
+	NextShardid            int64         `json:"next_shardid"`             // Next available shard id in this cluster
+	EnabledFeatures        []FeatureFlag `json:"enabled_features"`         // enabled features in this cluster.
 }
 
 // +genclient
