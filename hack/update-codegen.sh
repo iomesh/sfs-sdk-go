@@ -30,7 +30,7 @@ BOILERPLATE="${SCRIPT_ROOT}/boilerplate.go.txt"
 
 CODEGEN_PKG="${CODEGEN_PKG:-$(
     cd ${REPO_ROOT}
-    ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || go list -m -f "{{.Dir}}" k8s.io/code-generator
+    ls -d -1 ${GOPATH}/src/k8s.io/code-generator 2>/dev/null || go list -m -f "{{.Dir}}" k8s.io/code-generator
 )}"
 source "${CODEGEN_PKG}/kube_codegen.sh"
 
