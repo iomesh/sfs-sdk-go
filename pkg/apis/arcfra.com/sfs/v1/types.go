@@ -92,6 +92,7 @@ type ClusterSpec struct {
 	NextSessionID          int64         `json:"next_session_id"`          // Next available session id in this cluster
 	NextShardid            int64         `json:"next_shardid"`             // Next available shard id in this cluster
 	EnabledFeatures        []FeatureFlag `json:"enabled_features"`         // enabled features in this cluster.
+	EnableNFSFromWindows   bool          `json:"enable_nfs_from_windows"`  // Whether the Windows clients can access file storage via the NFSv3 protocol
 }
 
 // +genclient
