@@ -376,6 +376,7 @@ type NodeSpec struct {
 	NodeUUID         *string           `json:"node_uuid"`             // Uuid of corresponding virtual machine. Currently used by elf cloud provider to find; corresponding virtual machine. Shouldn't be modified by manager or agent.
 	Online           bool              `json:"online"`                // If the node should be considered as a candidate when placing shards. Updated by end users.
 	DisableAutoStart bool              `json:"disable_auto_start,omitempty"`
+	Domain           *string           `json:"domain,omitempty"`      // Which domain this node is belong to in a stretched cluster.
 }
 
 // NodeStatus defines the observed state of Node.
