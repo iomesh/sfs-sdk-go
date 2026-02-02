@@ -947,6 +947,11 @@ func (in *NodeSpec) DeepCopyInto(out *NodeSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Domain != nil {
+		in, out := &in.Domain, &out.Domain
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
